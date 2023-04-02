@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <rect x="50" y="50" width="500" height="300" fill="#eee" stroke="#000" stroke-width="2" />
+  <line x1="50" y1="100" x2="550" y2="100" stroke="#000" stroke-width="2" />
+  <line x1="50" y1="150" x2="550" y2="150" stroke="#000" stroke-width="2" />
+  <line x1="50" y1="200" x2="550" y2="200" stroke="#000" stroke-width="2" />
+  
+  <text x="60" y="80" font-family="Arial" font-size="14" font-weight="bold">Cocoa Touch</text>
+  <text x="60" y="130" font-family="Arial" font-size="14" font-weight="bold">Media</text>
+  <text x="60" y="180" font-family="Arial" font-size="14" font-weight="bold">Core Services</text>
+  <text x="60" y="230" font-family="Arial" font-size="14" font-weight="bold">Core OS</text>
+  
+  <text x="120" y="80" font-family="Arial" font-size="14">- UIKit, MapKit, GameKit, etc.</text>
+  <text x="120" y="130" font-family="Arial" font-size="14">- Core Graphics, Core Animation, AVFoundation, etc.</text>
+  <text x="120" y="180" font-family="Arial" font-size="14">- Core Foundation, Core Data, Core Motion, etc.</text>
+  <text x="120" y="230" font-family="Arial" font-size="14">- XNU Kernel, File System, Memory Management, etc.</text>
+</svg>
