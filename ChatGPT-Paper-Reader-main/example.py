@@ -2,7 +2,7 @@ import pickle
 from gpt_reader.paper.paper import Paper
 from gpt_reader.pdf_reader import PaperReader
 
-reader = PaperReader(openai_key='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')
+reader = PaperReader(openai_key='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')
 paper = Paper('./US10488230.pdf')
 summary = reader.summarize(paper)
 
@@ -10,9 +10,12 @@ summary = reader.summarize(paper)
 pickle.dump(paper, open('digested_paper.pkl', 'wb'))
 paper = pickle.load(open('digested_paper.pkl', 'rb'))
 # print summary of a section
+print("paper_summaries----------------------")
+print(paper.paper_summaries)
+print("paper_summaries[4]----------------------")
 print(paper.paper_summaries[4])
 
-print(reader.question(paper, '请简要概述这项专利的主要内容和目的。'))
+# print(reader.question(paper, '请简要概述这项专利的主要内容和目的。'))
 # print(reader.question(paper, '该专利涉及哪些关键技术和创新点？'))
 # print(reader.question(paper, '请列出该专利的发明人、申请人和权利人（如适用）。'))
 # print(reader.question(paper, '该专利在哪个国家/地区申请？其申请日期和公开日期分别是什么？'))

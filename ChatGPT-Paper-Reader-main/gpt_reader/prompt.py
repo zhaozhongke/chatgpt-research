@@ -1,11 +1,13 @@
+
+# 3. List the inventors, applicants, and assignees of the patent (if applicable).
+# 4. What previous patents or literature are referenced by this patent? Briefly describe their relationship with the present patent.
+# 5. What existing technologies or products may be affected by this patent? Please briefly explain.
+# 6. You Need to ranslate all replys with Chinese language!
+
 BASE_POINTS = """
 
 1. Please provide a brief overview of the main content and purpose of this patent.
 2. What key technologies and innovations are involved in this patent?
-3. List the inventors, applicants, and assignees of the patent (if applicable).
-4. What previous patents or literature are referenced by this patent? Briefly describe their relationship with the present patent.
-5. What existing technologies or products may be affected by this patent? Please briefly explain.
-6. You Need to ranslate all replys with Chinese language!
 """
 
 READING_PROMPT = """
