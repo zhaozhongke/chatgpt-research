@@ -2,7 +2,7 @@ import pickle
 from gpt_reader.paper.paper import Paper
 from gpt_reader.pdf_reader import PaperReader
 
-reader = PaperReader(openai_key='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')
+reader = PaperReader(openai_key='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')
 paper = Paper('./US10488230.pdf')
 summary = reader.summarize(paper)
 
