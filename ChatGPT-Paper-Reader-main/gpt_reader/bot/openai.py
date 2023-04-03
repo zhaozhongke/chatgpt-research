@@ -6,14 +6,24 @@ from pdfminer.layout import LTTextContainer
 import json
 import tqdm
 import tiktoken
+import re
 
+# BASE_POINTS = """
+# 1. Who are the authors?
+# 2. What is the process of the proposed method?
+# 3. What is the performance of the proposed method? Please note down its performance metrics.
+# 4. What are the baseline models and their performances? Please note down these baseline methods.
+# 5. What dataset did this paper use?
+# 6. You Need to ranslate all replys with Chinese language!
+# """
 
 BASE_POINTS = """
-1. Who are the authors?
-2. What is the process of the proposed method?
-3. What is the performance of the proposed method? Please note down its performance metrics.
-4. What are the baseline models and their performances? Please note down these baseline methods.
-5. What dataset did this paper use?
+1. Please provide a brief overview of the main content and purpose of this patent.
+2. What key technologies and innovations are involved in this patent?
+3. List the inventors, applicants, and assignees of the patent (if applicable).
+4. What previous patents or literature are referenced by this patent? Briefly describe their relationship with the present patent.
+5. What existing technologies or products may be affected by this patent? Please briefly explain.
+6. You Need to ranslate all replys with Chinese language!
 """
 
 
@@ -49,6 +59,7 @@ class ReaderBot(object):
         self.read_buff = 300
         self.question_msg = None
 
+    
     def init_prompt(self, text):
         prompt = [
             {"role": "system", "content": text},
@@ -57,6 +68,17 @@ class ReaderBot(object):
         return prompt
 
 
+    max_allowed_tokens = 4096  # 请将此值替换为您使用的模型的最大允许tokens数量
+   
+    def truncate_text_to_tokens(self, text, max_tokens):
+        cleaned_text = re.sub(r'\\n|\s+', ' ', text).replace('\\n','').replace("'", "")
+        # 去掉逗号和其他符号前后的空格
+        cleaned_text = re.sub(r'\s*([,()])\s*', r'\1', cleaned_text)
+        tokens = re.findall(r'\w+|\W+', cleaned_text)
+        truncated_tokens = tokens[:max_tokens]
+        truncated_text = ''.join(truncated_tokens)
+        return truncated_text
+        
     def parse_pdf_title(self, pdf_path, title_length_filter=30):
 
         init_prompt = """
@@ -78,14 +100,19 @@ class ReaderBot(object):
                         possible_titles.append(txt)
 
         msg = self.init_prompt(init_prompt)
+ 
+        content = "This are the texts: {}".format(possible_titles)
+        truncated_text = self.truncate_text_to_tokens(content, self.max_allowed_tokens)
         msg.append({
-            "role": "user", "content": "This are the texts: {}".format(possible_titles)
+            "role": "user", "content":truncated_text
         })
 
         ret = self.bot_core.communicate(msg)
         rs = json.loads(ret)
         return rs
     
+
+
     def read_from_path(self, ):
         pass
 
@@ -159,10 +186,12 @@ class ReaderBot(object):
         for (title, contents) in tqdm.tqdm(paper.paper_parts):
 
             # Adding the user message to the conversation messages
-            new_msg = {"role": "user", "content": 'now I send you page part {}：{}'.format(title, contents)}
+            truncated_contents = self.truncate_text_to_tokens(contents, self.max_allowed_tokens)
+            new_msg = {"role": "user", "content": 'now I send you page part {}：{}'.format(title, truncated_contents)}
             msg.append(new_msg)
             # Sending the messages to the API and getting the response
             msg = self.drop_conversation(msg, self.bot_core.context_szie)
+
             response = self.bot_core.communicate(msg)
             resp = {"role":"system", "content": response}
             msg.append(resp)
