@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 *.pyo
 # Ignore JetBrains IDE configuration
-.idea/
+.idea/patent_output/
+.venv/

@@ -18,18 +18,16 @@ import re
 # """
 
 BASE_POINTS = """
-1. Please provide a brief overview of the main content and purpose of this patent.
-2. What key technologies and innovations are involved in this patent?
-3. List the inventors, applicants, and assignees of the patent (if applicable).
-4. What previous patents or literature are referenced by this patent? Briefly describe their relationship with the present patent.
-5. What existing technologies or products may be affected by this patent? Please briefly explain.
-6. You Need to ranslate all replys with Chinese language!
+1. Summarize this part in detail. The rules are as follows:
+If this content is the basic information of the paper, please summarize the basic information of the paper.
+If it is a part of the paper, answer which part of the whole paper this content belongs to, and please explain and summarize this content in detail.
+2. You need to translate all responses in Chinese with part number !
 """
 
 
 class OpenAIBotCore(object):
 
-    def __init__(self, api_key, model='gpt-3.5-turbo', temperature=0.2, context_size=4096) -> None:
+    def __init__(self, api_key, model='gpt-3.5-turbo', temperature=1, context_size=4096) -> None:
         openai.api_key = api_key
         self.model = model
         self.temperature = temperature
@@ -68,7 +66,7 @@ class ReaderBot(object):
         return prompt
 
 
-    max_allowed_tokens = 4096  # 请将此值替换为您使用的模型的最大允许tokens数量
+    max_allowed_tokens = 3000  # 请将此值替换为您使用的模型的最大允许tokens数量
    
     def truncate_text_to_tokens(self, text, max_tokens):
         cleaned_text = re.sub(r'\\n|\s+', ' ', text).replace('\\n','').replace("'", "")
@@ -162,22 +160,23 @@ class ReaderBot(object):
 
         # prepare paper
         if not paper.has_catelogue():
-            print('Beep....Beep....Beep.... Parsing')
+            print('Beep....Beep....Beep.... Parsing {}'.format(paper.pdf_path))
             titles = self.parse_pdf_title(paper.pdf_path)
             paper.set_catelogue(titles['titles'])
         paper.split_paper_by_titles()
         tokens = paper.compute_part_tokens()
-        print('Beep....Beep....Beep.... I am reading')
+        print('Beep....Beep....Beep.... I am reading {}'.format(paper.pdf_path))
 
         reading_prompt = """
         You are a researcher helper bot. You can help the user with research paper reading and summarizing. \n
         Now I am going to send you a paper. You need to read it and summarize it for me part by part. \n
         When you are reading, You need to focus on these key points:{},
 
-        And You need to generate a brief but informative summary for this part in one sentence. 
+        And You need to generate a brief but informative summary for this part in three sentence. 
+        And You need to replace PART_NUMBER value below with actual part number .
         And  You need to translate all reply content to Chinese . 
         Your return format:
-        - summary: '...'
+        - summary PART_NUMBER '...'
         """.format(self.points_to_focus)
 
         msg = self.init_prompt(reading_prompt)
@@ -199,7 +198,7 @@ class ReaderBot(object):
             summaries.append((title, response))
 
         paper.paper_summaries.extend(summaries)
-        print('Bzzzt-klonk... Reading Done, I have built memories for this paper.')
+        print('Bzzzt-klonk... Reading Done, I have built memories for this paper {} .'.format(paper.pdf_path))
         return paper
 
     def question(self, paper: Paper, question_str):
@@ -220,7 +219,7 @@ class ReaderBot(object):
         """
 
         if self.question_msg is None:
-            self.question_msg = [{'role': 'system', 'content': prompt}]
+            self.question_msg = [{'role': 'system', 'content': self.truncate_text_to_tokens(prompt,self.max_allowed_tokens)}]
         
         self.question_msg.append({'role': 'user', 'content': """Now I send you the quenstion: {} \n   
                         """.format(question_str)})
